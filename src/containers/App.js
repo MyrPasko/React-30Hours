@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import './App.css';
-import Person from './Person/Person';
+import classes from './App.css';
+import Persons from '../components/Persons/Persons';
 
 class App extends Component {
     state = {
@@ -15,7 +15,7 @@ class App extends Component {
     };
 
     deletePersonHandler = (index) => {
-        // const persons = this.state.persons.slice();
+        // const Persons = this.state.Persons.slice();
         const persons = [...this.state.persons];
         persons.splice(index, 1);
         this.setState({persons: persons});
@@ -26,11 +26,12 @@ class App extends Component {
          * state without mutating it, the best practice */
 
         const personIndex = this.state.persons.findIndex((pers) => {
-          return pers.id === id;
+            return pers.userId === id;
         });
 
-        // const person = Object.assign({}, this.state.persons[personIndex]);
+        // const person = Object.assign({}, this.state.Persons[personIndex]);
         const person = {...this.state.persons[personIndex]};
+
         person.name = event.target.value;
 
         const persons = [...this.state.persons];
@@ -47,53 +48,39 @@ class App extends Component {
     };
 
     render() {
-        const style = {
-            backgroundColor: 'green',
-            color: 'white',
-            font: 'inherit',
-            border: '1px solid blue',
-            padding: '8px',
-            cursor: 'pointer'
-        };
-
         let persons = null;
+        let btnClass = '';
 
         if (this.state.showPersons) {
             persons = (
                 <div>
-                    {this.state.persons.map((person, index) => {
-                        return (
-                            <Person
-                                key={person.id}
-                                click={this.deletePersonHandler.bind(this, index)}
-                                name={person.name}
-                                age={person.age}
-                                changed={(event) => this.nameChangedHandler(event, person.id)}
-                            />
-                        )
-                    })}
+                    <Persons
+                        persons={this.state.persons}
+                        clicked={this.deletePersonHandler}
+                        changed={this.nameChangedHandler}
+                    />
                 </div>
             );
 
-            style.backgroundColor = 'red'
+            btnClass = classes.Red;
+
         }
 
-        let classes = [];
+        let assignedClasses = [];
 
-        if(this.state.persons.length <= 2) {
-            classes.push('red');
+        if (this.state.persons.length <= 2) {
+            assignedClasses.push(classes.red);
         }
-        if(this.state.persons.length <= 1) {
-            classes.push('bold');
+        if (this.state.persons.length <= 1) {
+            assignedClasses.push(classes.bold);
         }
 
         return (
-            <div className="App">
+            <div className={classes.App}>
                 <h1>Hi, I am a bad MotherFucker</h1>
-                <p className={classes.join(' ')} >This is really working.</p>
-                <button
-                    style={style}
-                    onClick={this.togglePersonsHandler}
+                <p className={assignedClasses.join(' ')}>This is really working.</p>
+                <button className={btnClass}
+                        onClick={this.togglePersonsHandler}
                 >Toggle Persons
                 </button>
                 {persons}
