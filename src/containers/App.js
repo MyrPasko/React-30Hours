@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 import classes from './App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from "../components/Cockpit/Cockpit";
 
-class App extends Component {
+class App extends PureComponent {
     constructor(props) {
         super(props);
         console.log('[App.js] From the constructor.', props);
@@ -25,6 +25,22 @@ class App extends Component {
 
     componentDidMount() {
         console.log('[App.js] From the Component Did Mount.');
+    }
+
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     console.log('[UPDATE App.js] From Should Component Update', nextProps, nextState);
+    //     return nextState.persons !== this.state.persons ||
+    //         nextState.showPersons !== this.state.showPersons;
+    // }
+
+    componentWillUpdate(nextProps, nextState) {
+        console.log('[UPDATE App.js] From Component Will Update', nextProps, nextState);
+
+    }
+
+    componentDidUpdate() {
+        console.log('[UPDATE App.js] From Component Did Update');
+
     }
 
     deletePersonHandler = (index) => {
@@ -63,7 +79,7 @@ class App extends Component {
     render() {
         let persons = null;
 
-        console.log('[App.js] From the render.');
+        console.log('[RENDER App.js] From the render.');
 
         if (this.state.showPersons) {
             persons = (
@@ -80,6 +96,7 @@ class App extends Component {
 
         return (
             <div className={classes.App}>
+                <button onClick={() => {this.setState({showPersons: true})}}>Show persons</button>
                 <Cockpit
                     appTitle={this.props.title}
                     showPersons={this.state.showPersons}
