@@ -1,7 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import classes from './App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from "../components/Cockpit/Cockpit";
+import Aux from '../hoc/Auxx';
+import withClass from '../hoc/WithClass';
+
+export const AuthContext = React.createContext(false);
 
 class App extends PureComponent {
     constructor(props) {
@@ -15,7 +19,9 @@ class App extends PureComponent {
                 {id: 4, name: 'Julia', age: 29},
             ],
             otherState: 'some other value',
-            showPersons: false
+            showPersons: false,
+            toggleClicked: 0,
+            authenticated: false
         };
     }
 
@@ -38,9 +44,21 @@ class App extends PureComponent {
 
     }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        console.log('[UPDATE App.js] From Component Get Derived State From Props',
+            nextProps,
+            prevState);
+
+        return prevState;
+    }
+
+    getSnapshotBeforeUpdate() {
+        console.log('[UPDATE App.js] From Component Get Snapshot Before Update');
+
+    }
+
     componentDidUpdate() {
         console.log('[UPDATE App.js] From Component Did Update');
-
     }
 
     deletePersonHandler = (index) => {
@@ -73,7 +91,22 @@ class App extends PureComponent {
 
     togglePersonsHandler = () => {
         const doesShow = this.state.showPersons;
-        this.setState({showPersons: !doesShow});
+
+        this.setState((prevState, props) => {
+            return {
+                showPersons: !doesShow,
+                toggleClicked: prevState.toggleClicked + 1
+            }
+        });
+        /** It is a wrong way - use this.state in setState*/
+        // this.setState({
+        //     showPersons: !doesShow,
+        //     toggleClicked: this.state.toggleClicked + 1
+        // });
+    };
+
+    loginHandler = () => {
+        this.setState({authenticated: true})
     };
 
     render() {
@@ -82,32 +115,35 @@ class App extends PureComponent {
         console.log('[RENDER App.js] From the render.');
 
         if (this.state.showPersons) {
-            persons = (
-                <div>
-                    <Persons
-                        persons={this.state.persons}
-                        clicked={this.deletePersonHandler}
-                        changed={this.nameChangedHandler}
-                    />
-                </div>
-            );
+            persons = <Persons
+                persons={this.state.persons}
+                clicked={this.deletePersonHandler}
+                changed={this.nameChangedHandler}
+                // isAuthenticated={this.state.authenticated}
+            />
         }
 
 
         return (
-            <div className={classes.App}>
-                <button onClick={() => {this.setState({showPersons: true})}}>Show persons</button>
+            <Aux>
+                <button onClick={() => {
+                    this.setState({showPersons: true})
+                }}>Show persons
+                </button>
                 <Cockpit
                     appTitle={this.props.title}
                     showPersons={this.state.showPersons}
                     persons={this.state.persons}
+                    login={this.loginHandler}
                     clicked={this.togglePersonsHandler}
                 />
-                {persons}
-            </div>
+                <AuthContext.Provider
+                    value={this.state.authenticated}
+                >{persons}</AuthContext.Provider>
+            </Aux>
         )
         //   return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Is it work now?'), 'Hi, I am a bad MotherFucker')
     }
 }
 
-export default App;
+export default withClass(App, classes.App);
